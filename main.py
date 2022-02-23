@@ -7,7 +7,7 @@ load_dotenv()
 
 # Fields
 # backendBase = 'http://localhost:3002/'
-backendBase = 'https://tsdbackend.herokuapp.com/'
+backendBase = 'https://tsdnftbackend.herokuapp.com/'
 walletLinking = True
 whitelistSpots = 500
 
