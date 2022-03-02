@@ -102,6 +102,20 @@ async def linkwallet(ctx: Context,wallet):
         print(e)
         await ctx.send('Error executing command',hidden=True)
 
+@slash.slash(name='check',description='Check your whitelist status!',guild_ids=guilds)
+async def checklink(ctx: Context):
+    await ctx.defer(hidden=True)
+    checkReq = requests.get(f'{backendBase}checklink?key={apiAccessKey}&discordId={str(ctx.author.id)}')
+    try:
+        checkReq.raise_for_status()
+        checkJson = checkReq.json()
+        if checkJson['wallet'] != None:
+            await ctx.send(f'You are linked with this wallet:\n\n{checkJson["wallet"]}',hidden=True)
+        else:
+            await ctx.send(f'You are not linked!',hidden=True)
+    except Exception as e:
+        await ctx.send('Error runnig command. Server may be down at this time',hidden=True)
+
 @slash.slash(name='unlink',description='Unlink your wallet from The Sol Den',guild_ids=guilds)
 async def unlinkwallet(ctx):
     await ctx.defer(hidden=True)
