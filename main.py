@@ -9,7 +9,7 @@ load_dotenv()
 # backendBase = 'http://localhost:3002/'
 backendBase = 'https://tsdnftbackend.herokuapp.com/'
 walletLinking = True
-whitelistSpots = 777
+whitelistSpots = 1000
 
 # Guilds
 TheSolDen = 939765005421785138
