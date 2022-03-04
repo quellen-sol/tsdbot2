@@ -11,6 +11,15 @@ backendBase = 'https://tsdnftbackend.herokuapp.com/'
 walletLinking = True
 whitelistSpots = 1000
 
+# Users
+quellen = 416430897894522890
+oil = 941423639306321990
+cazz = 733199983288909824
+nerg = 547196315403026433
+puzz = 261914293740634113
+
+admins = [quellen, oil, cazz, nerg, puzz]
+
 # Guilds
 TheSolDen = 939765005421785138
 
@@ -115,6 +124,18 @@ async def checklink(ctx: Context):
             await ctx.send(f'You are not linked!',hidden=True)
     except Exception as e:
         await ctx.send('Error runnig command. Server may be down at this time',hidden=True)
+
+@slash.slash(name='manuallink',description='(Admin only) Manually link a member', guild_ids=guilds)
+async def manuallink(ctx: Context, user: discord.User, wallet: str):
+    await ctx.defer(hidden=True)
+    if ctx.author.id in admins:
+        linkReq = requests.post(f'{backendBase}linkdiscord',headers={'Content-Type': 'application/json'},data=json.dumps({'key': apiAccessKey, 'discordId': str(user.id), 'wallet': wallet, 'override': True}))
+        if linkReq.status_code == 200:
+            await ctx.send(f'Successfully linked {user.display_name} with wallet: {wallet}',hidden=True)
+        else:
+            await ctx.send(f'Error running command. Send a screenshot to <@!{quellen}>',hidden=True)
+    else:
+        await ctx.send('You are not admin!',hidden=True)
 
 @slash.slash(name='unlink',description='Unlink your wallet from The Sol Den',guild_ids=guilds)
 async def unlinkwallet(ctx):
