@@ -9,7 +9,7 @@ load_dotenv()
 # backendBase = 'http://localhost:3002/'
 backendBase = 'https://tsdnftbackend.herokuapp.com/'
 walletLinking = True
-whitelistSpots = 1000
+whitelistSpots = 1111
 
 # Users
 quellen = 416430897894522890
@@ -123,7 +123,7 @@ async def checklink(ctx: Context):
         else:
             await ctx.send(f'You are not linked!',hidden=True)
     except Exception as e:
-        await ctx.send('Error runnig command. Server may be down at this time',hidden=True)
+        await ctx.send('Error running command. Server may be down at this time',hidden=True)
 
 @slash.slash(name='manuallink',description='(Admin only) Manually link a member', guild_ids=guilds)
 async def manuallink(ctx: Context, user: discord.User, wallet: str):
