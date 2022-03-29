@@ -158,9 +158,9 @@ async def unlinkwallet(ctx):
     else: 
         await ctx.send(f'You can only unlink your wallet in <#{linkChannel}>',hidden=True)
 
-@slash.slash(name='golink',description='Go link!',guild_ids=guilds)
-async def golinkmsg(ctx):
-    await ctx.send(f'You\'re all set! Make sure to head over to <#{linkChannel}> to link your wallet! If you do not get a response from the bot, you did not do it correctly!!')
+# @slash.slash(name='golink',description='Go link!',guild_ids=guilds)
+# async def golinkmsg(ctx):
+#     await ctx.send(f'You\'re all set! Make sure to head over to <#{linkChannel}> to link your wallet! If you do not get a response from the bot, you did not do it correctly!!')
 
 @bot.event
 async def on_ready():
