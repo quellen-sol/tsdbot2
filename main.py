@@ -37,7 +37,7 @@ allowedLinkChannels = [945904467239387186]
 class TheReferee(Bot):
     def __init__(self, *args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.statTask = self.loop.create_task(self.updateStats())
+        # self.statTask = self.loop.create_task(self.updateStats())
         self.memberTask = self.loop.create_task(self.updateMemberStats())
 
     async def updateStats(self):
