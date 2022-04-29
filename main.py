@@ -39,6 +39,16 @@ class TheReferee(Bot):
         super().__init__(*args,**kwargs)
         # self.statTask = self.loop.create_task(self.updateStats())
         self.memberTask = self.loop.create_task(self.updateMemberStats())
+        self.leaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
+
+    async def aggregateLeaderboard(self):
+        await self.wait_until_ready()
+        while True:
+            try:
+                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': os.getenv('accesskey')}))
+            except Exception as e:
+                pass
+            await asyncio.sleep(60)
 
     async def updateStats(self):
         await self.wait_until_ready()
