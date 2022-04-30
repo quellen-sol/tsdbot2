@@ -6,10 +6,23 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-requests = "*"
-discord-py-interactions = "*"
-"discord.py" = "*"
-python-dotenv = "*"
+requests = "==2.27.1"
+discord-py-interactions = "==3.0.2"
+"discord.py" = "==1.7.3"
+python-dotenv = "==0.19.2"
+aiohttp = "==3.7.4.post0"
+async-timeout = "==3.0.1"
+asyncio = "==3.4.3"
+attrs = "==21.4.0"
+certifi = "==2021.10.8"
+chardet = "==4.0.0"
+charset-normalizer = "==2.0.12"
+idna = "==3.3"
+multidict = "==6.0.2"
+typing-extensions = "==4.1.1"
+urllib3 = "==1.26.8"
+websockets = "==3.4"
+yarl = "==1.7.2"
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"

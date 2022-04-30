@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Fields
-# backendBase = 'http://localhost:3002/'
-backendBase = 'https://tsdnftbackend.herokuapp.com/'
+backendBase = 'http://localhost:3002/'
+# backendBase = 'https://tsdnftbackend.herokuapp.com/'
 walletLinking = True
 whitelistSpots = 1111
 
@@ -40,15 +40,23 @@ class TheReferee(Bot):
         # self.statTask = self.loop.create_task(self.updateStats())
         self.memberTask = self.loop.create_task(self.updateMemberStats())
         self.leaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
+        self.clearCooldownsTask = self.loop.create_task(self.clearCooldowns())
 
     async def aggregateLeaderboard(self):
         await self.wait_until_ready()
         while True:
+            await asyncio.sleep(60)
             try:
-                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': os.getenv('accesskey')}))
+                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey})).close()
             except Exception as e:
                 pass
-            await asyncio.sleep(60)
+            
+    
+    async def clearCooldowns(self):
+        await self.wait_until_ready()
+        while True:
+            clearReq = requests.post(f'{backendBase}clearcooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}))
+            await asyncio.sleep(120)
 
     async def updateStats(self):
         await self.wait_until_ready()
