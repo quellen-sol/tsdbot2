@@ -47,7 +47,7 @@ class TheReferee(Bot):
         while True:
             await asyncio.sleep(60)
             try:
-                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey})).close()
+                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}),timeout=2.0)
             except Exception as e:
                 pass
             
@@ -56,6 +56,7 @@ class TheReferee(Bot):
         await self.wait_until_ready()
         while True:
             try:
+                print('Clearing cooldowns')
                 clearReq = requests.post(f'{backendBase}clearcooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}))
             except Exception as e:
                 pass
@@ -92,7 +93,6 @@ guilds = [939765005421785138]
 apiAccessKey = os.getenv('accesskey')
 
 walletValidationRegex = re.compile('^[\w^0OIl]{43,44}$')
-
 
 def isValidWallet(wallet: str):
     return walletValidationRegex.match(wallet) != None
