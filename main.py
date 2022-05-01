@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Fields
-backendBase = 'http://localhost:3002/'
-# backendBase = 'https://tsdnftbackend.herokuapp.com/'
+# backendBase = 'http://localhost:3002/'
+backendBase = 'https://tsdnftbackend.herokuapp.com/'
 walletLinking = True
 whitelistSpots = 1111
 
