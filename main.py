@@ -158,6 +158,15 @@ async def manuallink(ctx: Context, user: discord.User, wallet: str):
     else:
         await ctx.send('You are not admin!',hidden=True)
 
+@slash.slash(name='snapshotleaderboard', description='Take a snapshot of the leaderboard (Quellen Only)', guild_ids=guilds)
+async def scleaderboard(ctx: Context):
+    await ctx.defer(hidden=True)
+    if ctx.author.id == quellen:
+        snapshotReq = requests.post(f'{backendBase}snapshotleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
+        await ctx.send("Snapshotting Leaderboard", hidden=True)
+    else:
+        await ctx.send("You are not Quellen", hidden=True)
+
 @slash.slash(name='unlink',description='Unlink your wallet from The Sol Den',guild_ids=guilds)
 async def unlinkwallet(ctx):
     await ctx.defer(hidden=True)
