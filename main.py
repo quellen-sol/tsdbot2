@@ -45,7 +45,7 @@ class TheReferee(Bot):
     async def aggregateLeaderboard(self):
         await self.wait_until_ready()
         while True:
-            await asyncio.sleep(60)
+            await asyncio.sleep(120)
             try:
                 aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}),timeout=2.0)
             except Exception as e:
