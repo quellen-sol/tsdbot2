@@ -39,9 +39,9 @@ class TheReferee(Bot):
     def __init__(self, *args,**kwargs):
         super().__init__(*args,**kwargs)
         # self.statTask = self.loop.create_task(self.updateStats())
-        # self.memberTask = self.loop.create_task(self.updateMemberStats())
-        # self.leaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
-        # self.clearCooldownsTask = self.loop.create_task(self.clearCooldowns())
+        self.memberTask = self.loop.create_task(self.updateMemberStats())
+        self.leaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
+        self.clearCooldownsTask = self.loop.create_task(self.clearCooldowns())
         self.resetMaxesTask = self.loop.create_task(self.resetMaxes())
         self.nextMidnight = self.determineNextMidnight()
 
