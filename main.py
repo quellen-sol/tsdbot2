@@ -2,6 +2,7 @@ import asyncio, requests, json, discord, os, re
 from discord.ext.commands import Bot, Context
 from discord_slash import SlashCommand
 from dotenv import load_dotenv
+from datetime import date, datetime, timedelta
 
 load_dotenv()
 
@@ -38,20 +39,35 @@ class TheReferee(Bot):
     def __init__(self, *args,**kwargs):
         super().__init__(*args,**kwargs)
         # self.statTask = self.loop.create_task(self.updateStats())
-        self.memberTask = self.loop.create_task(self.updateMemberStats())
-        self.leaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
-        self.clearCooldownsTask = self.loop.create_task(self.clearCooldowns())
+        # self.memberTask = self.loop.create_task(self.updateMemberStats())
+        # self.leaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
+        # self.clearCooldownsTask = self.loop.create_task(self.clearCooldowns())
+        self.resetMaxesTask = self.loop.create_task(self.resetMaxes())
+        self.nextMidnight = self.determineNextMidnight()
+
+    def determineNextMidnight(self):
+        dt = date.today()
+        return datetime.combine(dt + timedelta(1), datetime.min.time())
+        # return datetime.now() + timedelta(0,10)
+
+    async def resetMaxes(self):
+        await self.wait_until_ready()
+        while True:
+            await asyncio.sleep(10)
+            if datetime.now() > self.nextMidnight:
+                print("RESETTING MAXES")
+                resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
+                self.nextMidnight = self.determineNextMidnight()
 
     async def aggregateLeaderboard(self):
         await self.wait_until_ready()
         while True:
             await asyncio.sleep(120)
             try:
-                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}),timeout=2.0)
+                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}),timeout = 2.0)
             except Exception as e:
                 pass
             
-    
     async def clearCooldowns(self):
         await self.wait_until_ready()
         while True:
