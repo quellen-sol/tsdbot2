@@ -74,11 +74,11 @@ class TheReferee(Bot):
     async def clearCooldowns(self):
         await self.wait_until_ready()
         while True:
-            await asyncio.sleep(120)
             try:
                 clearReq = requests.post(f'{backendBase}clearcooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}))
             except Exception as e:
                 pass
+            await asyncio.sleep(120)
             
 
     async def updateStats(self):
