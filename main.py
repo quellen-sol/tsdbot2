@@ -59,7 +59,7 @@ class TheReferee(Bot):
             await asyncio.sleep(10)
             if datetime.now() > self.nextMidnight:
                 print("RESETTING MAXES")
-                resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
+                # resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
                 self.nextMidnight = self.determineNextMidnight()
 
     async def aggregateLeaderboard(self):
