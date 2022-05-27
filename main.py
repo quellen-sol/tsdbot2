@@ -2,7 +2,7 @@ import asyncio, requests, json, discord, os, re
 from discord.ext.commands import Bot, Context
 from discord_slash import SlashCommand
 from dotenv import load_dotenv
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone, time
 
 load_dotenv()
 
@@ -35,6 +35,8 @@ onlineMemberStat = 945910425218863124
 
 allowedLinkChannels = [945904467239387186]
 
+timezoneOffset = -7 #PDT = -7, UTC = 0
+
 class TheReferee(Bot):
     def __init__(self, *args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -47,9 +49,8 @@ class TheReferee(Bot):
 
     def determineNextMidnight(self):
         dt = date.today()
-        midnight = datetime.combine(dt + timedelta(1), datetime.min.time(), timezone(offset=timedelta(hours=-19)))
-        print(f"Reset time UTC: {midnight}")
-        print(f"Reset time PDT: {midnight.astimezone()}")
+        midnight = datetime.combine(dt + timedelta(1), time(12,0,0), timezone(timedelta(hours=timezoneOffset)))
+        print(f"Reset time: {midnight}")
         return midnight
         # return datetime.now() + timedelta(0,10)
 
@@ -57,9 +58,9 @@ class TheReferee(Bot):
         await self.wait_until_ready()
         while True:
             await asyncio.sleep(10)
-            if datetime.now() > self.nextMidnight:
+            if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextMidnight:
                 print("RESETTING MAXES")
-                # resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
+                resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
                 self.nextMidnight = self.determineNextMidnight()
 
     async def aggregateLeaderboard(self):
