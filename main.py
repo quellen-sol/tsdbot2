@@ -24,9 +24,14 @@ admins = [quellen, oil, cazz, nerg, puzz]
 # Guilds
 TheSolDen = 939765005421785138
 
+# Roles
+adminRole = 939768882263117824
+modsRole = 939770454456037386
+
 # Channels
 successfulLinksChannel = 945904003714261014
 linkChannel = 945904467239387186
+top10Channel = 979872560747511818
 
 # Stat Channels
 whitelistStat = 945909310175739924
@@ -41,11 +46,13 @@ class TheReferee(Bot):
     def __init__(self, *args,**kwargs):
         super().__init__(*args,**kwargs)
         # self.statTask = self.loop.create_task(self.updateStats())
-        self.memberTask = self.loop.create_task(self.updateMemberStats())
-        self.leaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
+        # self.memberTask = self.loop.create_task(self.updateMemberStats())
+        self.aggLeaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
         self.clearCooldownsTask = self.loop.create_task(self.clearCooldowns())
         self.resetMaxesTask = self.loop.create_task(self.resetMaxes())
+        self.snapshotLeaderboardTask = self.loop.create_task(self.resetLeaderboard())
         self.nextMidnight = self.determineNextMidnight()
+        self.nextFriday = self.determineNextFriday()
 
     def determineNextMidnight(self):
         dt = date.today()
@@ -53,6 +60,14 @@ class TheReferee(Bot):
         print(f"Reset time: {midnight}")
         return midnight
         # return datetime.now() + timedelta(0,10)
+
+    def determineNextFriday(self):
+        today = date.today()
+        nextFriday = datetime.combine(today + timedelta(days=(4-today.weekday())%7), time(12,0,0), timezone(timedelta(hours=timezoneOffset)))
+        while datetime.now(timezone(timedelta(hours=timezoneOffset))) > nextFriday:
+            nextFriday += timedelta(days=7)
+        print(f"Next Friday: {nextFriday}")
+        return nextFriday
 
     async def resetMaxes(self):
         await self.wait_until_ready()
@@ -62,6 +77,27 @@ class TheReferee(Bot):
                 print("RESETTING MAXES")
                 resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
                 self.nextMidnight = self.determineNextMidnight()
+
+    async def resetLeaderboard(self):
+        await self.wait_until_ready()
+        while True:
+            await asyncio.sleep(10)
+            if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextFriday:
+                print("snapshotting leaderboard!")
+                # Send req
+                topTenReq = requests.get(f'{backendBase}gettopten', headers={'Content-Type': 'application/json'})
+                topTenJson = topTenReq.json()
+                if topTenReq.status_code == 200:
+                    channel: discord.TextChannel = self.get_channel(top10Channel)
+                    embed = discord.Embed(title=f"Top 10 Leaderboard for {date.today()}", color=0xFF7B00)
+                    num = 1
+                    for wallet in topTenJson:
+                        embed.add_field(name=f"#{num}", value=wallet, inline=False)
+                        num += 1
+                    await channel.send(f"<@&{adminRole}> <@&{modsRole}>",embed=embed)
+                snapshotReq = requests.post(f'{backendBase}snapshotleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
+                self.nextFriday = self.determineNextFriday()
+
 
     async def aggregateLeaderboard(self):
         await self.wait_until_ready()
