@@ -32,6 +32,7 @@ modsRole = 939770454456037386
 successfulLinksChannel = 945904003714261014
 linkChannel = 945904467239387186
 top10Channel = 979872560747511818
+botLogChannel = 982060324603695104
 
 # Stat Channels
 whitelistStat = 945909310175739924
@@ -73,10 +74,13 @@ class TheReferee(Bot):
         await self.wait_until_ready()
         while True:
             await asyncio.sleep(10)
-            if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextMidnight:
-                print("RESETTING MAXES")
-                resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
-                self.nextMidnight = self.determineNextMidnight()
+            try:
+                if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextMidnight:
+                    print("RESETTING MAXES")
+                    resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
+                    self.nextMidnight = self.determineNextMidnight()
+            except Exception as e:
+                await self.get_channel(botLogChannel).send(str(e))
 
     async def resetLeaderboard(self):
         await self.wait_until_ready()
@@ -85,17 +89,20 @@ class TheReferee(Bot):
             if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextFriday:
                 print("snapshotting leaderboard!")
                 # Send req
-                topTenReq = requests.get(f'{backendBase}gettopten', headers={'Content-Type': 'application/json'})
-                topTenJson = topTenReq.json()
-                if topTenReq.status_code == 200:
-                    channel: discord.TextChannel = self.get_channel(top10Channel)
-                    embed = discord.Embed(title=f"Top 10 Leaderboard for {date.today()}", color=0xFF7B00)
-                    num = 1
-                    for wallet in topTenJson:
-                        embed.add_field(name=f"#{num}", value=wallet, inline=False)
-                        num += 1
-                    await channel.send(f"<@&{adminRole}> <@&{modsRole}>",embed=embed)
-                snapshotReq = requests.post(f'{backendBase}snapshotleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
+                try:
+                    topTenReq = requests.get(f'{backendBase}gettopten', headers={'Content-Type': 'application/json'})
+                    if topTenReq.status_code == 200:
+                        topTenJson = topTenReq.json()
+                        channel: discord.TextChannel = self.get_channel(top10Channel)
+                        embed = discord.Embed(title=f"Top 10 Leaderboard for {date.today()}", color=0xFF7B00)
+                        num = 1
+                        for wallet in topTenJson:
+                            embed.add_field(name=f"#{num}", value=wallet, inline=False)
+                            num += 1
+                        await channel.send(f"<@&{adminRole}> <@&{modsRole}>",embed=embed)
+                    snapshotReq = requests.post(f'{backendBase}snapshotleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
+                except Exception as e:
+                    await self.get_channel().send(str(e))
                 self.nextFriday = self.determineNextFriday()
 
 
@@ -112,7 +119,7 @@ class TheReferee(Bot):
         await self.wait_until_ready()
         while True:
             try:
-                clearReq = requests.post(f'{backendBase}clearcooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}))
+                clearReq = requests.post(f'{backendBase}clearcooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
             except Exception as e:
                 pass
             await asyncio.sleep(120)
@@ -122,7 +129,7 @@ class TheReferee(Bot):
         await self.wait_until_ready()
         while True:
             try:
-                statReq = requests.get(f'{backendBase}getstats?key={apiAccessKey}',headers={'Content-Type':'application/json'})
+                statReq = requests.get(f'{backendBase}getstats?key={apiAccessKey}',headers={'Content-Type':'application/json'}, timeout=5.0)
                 statReqJson = statReq.json()
                 numWhitelists = statReqJson['whitelists']
                 await self.get_channel(whitelistStat).edit(name=f'{clamp(0,whitelistSpots,int(numWhitelists))}/{whitelistSpots} Whitelisted')
