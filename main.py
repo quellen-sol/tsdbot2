@@ -76,13 +76,13 @@ class TheReferee(Bot):
         await self.wait_until_ready()
         while True:
             await asyncio.sleep(10)
-            try:
-                if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextMidnight:
+            if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextMidnight:
+                try:
                     print("RESETTING MAXES")
                     resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
-            except Exception as e:
-                await self.get_channel(botLogChannel).send(str(e))
-            self.nextMidnight = self.determineNextMidnight()
+                except Exception as e:
+                    await self.get_channel(botLogChannel).send(str(e))
+                self.nextMidnight = self.determineNextMidnight()
 
     async def resetLeaderboard(self):
         await self.wait_until_ready()
