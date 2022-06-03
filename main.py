@@ -104,7 +104,7 @@ class TheReferee(Bot):
                         await channel.send(f"<@&{adminRole}> <@&{modsRole}>",embed=embed)
                     snapshotReq = requests.post(f'{backendBase}snapshotleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
                 except Exception as e:
-                    await self.get_channel().send(str(e))
+                    await self.get_channel(botLogChannel).send(str(e))
                 self.nextFriday = self.determineNextFriday()
 
 
