@@ -57,7 +57,7 @@ class TheReferee(Bot):
 
     def determineNextMidnight(self):
         dt = date.today()
-        midnight = datetime.combine(dt, time(12,0,0), timezone(timedelta(hours=timezoneOffset)))
+        midnight = datetime.combine(dt, time(12,1,0), timezone(timedelta(hours=timezoneOffset)))
         print(f"Reset time: {midnight}")
         while datetime.now(timezone(timedelta(hours=timezoneOffset))) > midnight:
             midnight += timedelta(days=1)
@@ -66,7 +66,7 @@ class TheReferee(Bot):
 
     def determineNextFriday(self):
         today = date.today()
-        nextFriday = datetime.combine(today + timedelta(days=(4-today.weekday())%7), time(12,1,0), timezone(timedelta(hours=timezoneOffset)))
+        nextFriday = datetime.combine(today + timedelta(days=(4-today.weekday())%7), time(12,0,0), timezone(timedelta(hours=timezoneOffset)))
         while datetime.now(timezone(timedelta(hours=timezoneOffset))) > nextFriday:
             nextFriday += timedelta(days=7)
         print(f"Next Friday: {nextFriday}")
