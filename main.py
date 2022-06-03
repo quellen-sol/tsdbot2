@@ -58,9 +58,9 @@ class TheReferee(Bot):
     def determineNextMidnight(self):
         dt = date.today()
         midnight = datetime.combine(dt, time(12,1,0), timezone(timedelta(hours=timezoneOffset)))
-        print(f"Reset time: {midnight}")
         while datetime.now(timezone(timedelta(hours=timezoneOffset))) > midnight:
             midnight += timedelta(days=1)
+        print(f"Reset time: {midnight}")
         return midnight
         # return datetime.now() + timedelta(0,10)
 
@@ -79,10 +79,10 @@ class TheReferee(Bot):
             try:
                 if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextMidnight:
                     print("RESETTING MAXES")
-                    resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout = 2.0)
-                    self.nextMidnight = self.determineNextMidnight()
+                    resetReq = requests.post(f'{backendBase}resetmax', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
             except Exception as e:
                 await self.get_channel(botLogChannel).send(str(e))
+            self.nextMidnight = self.determineNextMidnight()
 
     async def resetLeaderboard(self):
         await self.wait_until_ready()
@@ -113,7 +113,7 @@ class TheReferee(Bot):
         while True:
             await asyncio.sleep(120)
             try:
-                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}),timeout = 2.0)
+                aggReq = requests.post(f'{backendBase}aggregateleaderboard', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}),timeout=2.0)
             except Exception as e:
                 pass
             
