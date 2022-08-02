@@ -7,8 +7,8 @@ from datetime import date, datetime, timedelta, timezone, time
 load_dotenv()
 
 # Fields
-# backendBase = 'http://localhost:3002/'
-backendBase = 'https://tsdnftbackend.herokuapp.com/'
+backendBase = 'http://localhost:3002/'
+# backendBase = 'https://tsdnftbackend.herokuapp.com/'
 walletLinking = True
 whitelistSpots = 1111
 
@@ -49,11 +49,12 @@ class TheReferee(Bot):
         # self.statTask = self.loop.create_task(self.updateStats())
         # self.memberTask = self.loop.create_task(self.updateMemberStats())
         self.aggLeaderboardTask = self.loop.create_task(self.aggregateLeaderboard())
-        self.clearCooldownsTask = self.loop.create_task(self.clearCooldowns())
+        self.clearFightCooldownsTask = self.loop.create_task(self.clearFightCooldowns())
         self.resetMaxesTask = self.loop.create_task(self.resetMaxes())
         self.snapshotLeaderboardTask = self.loop.create_task(self.resetLeaderboard())
         self.nextMidnight = self.determineNextMidnight()
         self.nextFriday = self.determineNextFriday()
+        self.nextUpgradeReset = self.determineNextFriday(timedelta(minutes=2))
 
     def determineNextMidnight(self):
         dt = date.today()
@@ -62,15 +63,14 @@ class TheReferee(Bot):
             midnight += timedelta(days=1)
         print(f"Reset time: {midnight}")
         return midnight
-        # return datetime.now() + timedelta(0,10)
 
-    def determineNextFriday(self):
+    def determineNextFriday(self, offset = timedelta()):
         today = date.today()
-        nextFriday = datetime.combine(today + timedelta(days=(4-today.weekday())%7), time(12,0,0), timezone(timedelta(hours=timezoneOffset)))
+        nextFriday = offset + datetime.combine(today + timedelta(days=(4-today.weekday())%7), time(12,0,0), timezone(timedelta(hours=timezoneOffset)))
         while datetime.now(timezone(timedelta(hours=timezoneOffset))) > nextFriday:
             nextFriday += timedelta(days=7)
         print(f"Next Friday: {nextFriday}")
-        return nextFriday
+        return nextFriday;
 
     async def resetMaxes(self):
         await self.wait_until_ready()
@@ -107,6 +107,18 @@ class TheReferee(Bot):
                     await self.get_channel(botLogChannel).send(str(e))
                 self.nextFriday = self.determineNextFriday()
 
+    async def resetUpgradeCooldowns(self):
+        await self.wait_until_ready()
+        while True:
+            await asyncio.sleep(10)
+            if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextFriday:
+                print("resetting upgrade cooldowns!")
+                # Send req
+                try:
+                    resetReq = requests.post(f'{backendBase}resetupgradecooldown', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
+                except Exception as e:
+                    await self.get_channel(botLogChannel).send(str(e))
+                self.nextFriday = self.determineNextFriday(timedelta(minutes=2))
 
     async def aggregateLeaderboard(self):
         await self.wait_until_ready()
@@ -117,16 +129,15 @@ class TheReferee(Bot):
             except Exception as e:
                 pass
             
-    async def clearCooldowns(self):
+    async def clearFightCooldowns(self):
         await self.wait_until_ready()
         while True:
             try:
-                clearReq = requests.post(f'{backendBase}clearcooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
+                clearReq = requests.post(f'{backendBase}clearfightcooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
             except Exception as e:
                 pass
             await asyncio.sleep(120)
             
-
     async def updateStats(self):
         await self.wait_until_ready()
         while True:
