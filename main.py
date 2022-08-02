@@ -7,8 +7,8 @@ from datetime import date, datetime, timedelta, timezone, time
 load_dotenv()
 
 # Fields
-backendBase = 'http://localhost:3002/'
-# backendBase = 'https://tsdnftbackend.herokuapp.com/'
+# backendBase = 'http://localhost:3002/'
+backendBase = 'https://tsdnftbackend.herokuapp.com/'
 walletLinking = True
 whitelistSpots = 1111
 
@@ -115,7 +115,7 @@ class TheReferee(Bot):
                 print("resetting upgrade cooldowns!")
                 # Send req
                 try:
-                    resetReq = requests.post(f'{backendBase}resetupgradecooldown', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
+                    resetReq = requests.post(f'{backendBase}clearupgradecooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
                 except Exception as e:
                     await self.get_channel(botLogChannel).send(str(e))
                 self.nextFriday = self.determineNextFriday(timedelta(minutes=2))
