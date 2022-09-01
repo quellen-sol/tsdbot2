@@ -55,6 +55,8 @@ class TheReferee(Bot):
         self.nextMidnight = self.determineNextMidnight()
         self.nextFriday = self.determineNextFriday()
 
+        self.yootTask = self.loop.create_task(self.checkForYootlist())
+
     def determineNextMidnight(self):
         dt = date.today()
         midnight = datetime.combine(dt, time(12,1,0), timezone(timedelta(hours=timezoneOffset)))
@@ -71,6 +73,17 @@ class TheReferee(Bot):
             nextFriday += timedelta(days=7)
         print(f"Next Friday: {nextFriday}")
         return nextFriday
+
+    async def checkForYootlist(self):
+        await self.wait_until_ready()
+        while True:
+            await asyncio.sleep(60);
+            listReq = requests.get("https://api.degods.com/scholarships/application/status?solPubkey=3uAvEjbkSY7GL2vddbczYwJxXWu74HHrkZeFB96u6Bi5", headers={'Content-Type': 'application/json'});
+            if listReq.status_code == 200:
+                listReq = listReq.json()
+                if listReq['status'] == 1:
+                    await self.get_channel(botLogChannel).send("<@!416430897894522890> You are y00tlisted gg lfg :boxing_glove:")
+                    break
 
     async def resetMaxes(self):
         await self.wait_until_ready()
