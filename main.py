@@ -124,14 +124,14 @@ class TheReferee(Bot):
         await self.wait_until_ready()
         while True:
             await asyncio.sleep(10)
-            if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextFriday:
+            if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextUpgradeReset:
                 print("resetting upgrade cooldowns!")
                 # Send req
                 try:
                     resetReq = requests.post(f'{backendBase}clearupgradecooldowns', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=1.0)
                 except Exception as e:
                     await self.get_channel(botLogChannel).send(str(e))
-                self.nextFriday = self.determineNextFriday(timedelta(minutes=2))
+                self.nextUpgradeReset = self.determineNextFriday(timedelta(minutes=2))
 
     async def aggregateLeaderboard(self):
         await self.wait_until_ready()
