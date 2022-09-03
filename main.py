@@ -277,6 +277,34 @@ async def unlinkwallet(ctx):
     else: 
         await ctx.send(f'You can only unlink your wallet in <#{linkChannel}>',hidden=True)
 
+@slash.slash(name='reprocessfailedupgrade', description='(Quellen only) Reprocess the current list of failed upgrades', guild_ids=guilds)
+async def reprocessUpgrades(ctx: Context):
+    await ctx.defer(hidden=True)
+    if ctx.author.id == quellen:
+        await ctx.send("Reprocessing failed upgrades", hidden=True)
+        reprocessReq = requests.post(f'{backendBase}reprocessfailed', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}))
+        await ctx.send("Reprocessing complete", hidden=True)
+    else:
+        await ctx.send("You are not Quellen", hidden=True)
+
+@slash.slash(name="failedlist", description="Get a list of failed upgrades", guild_ids=guilds)
+async def failedList(ctx: Context):
+    await ctx.defer(hidden=True)
+    # check if in admin list
+    if ctx.author.id in admins:
+        failedReq = requests.get(f'{backendBase}failedupgrades', headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}))
+        if failedReq.status_code == 200:
+            failedJson = failedReq.json()
+            if len(failedJson) == 0:
+                await ctx.send("No failed upgrades!", hidden=True)
+            else:
+                if (len(str(failedJson)) > 1900):
+                    await ctx.send("Too many failed upgrades to display", hidden=True)
+                    return
+                await ctx.send(json.dumps(failedJson, indent=2), hidden=True)
+        else:
+            await ctx.send("Error getting failed list", hidden=True)
+
 # @slash.slash(name='golink',description='Go link!',guild_ids=guilds)
 # async def golinkmsg(ctx):
 #     await ctx.send(f'You\'re all set! Make sure to head over to <#{linkChannel}> to link your wallet! If you do not get a response from the bot, you did not do it correctly!!')
