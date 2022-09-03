@@ -304,6 +304,8 @@ async def failedList(ctx: Context):
                 await ctx.send(json.dumps(failedJson, indent=2), hidden=True)
         else:
             await ctx.send("Error getting failed list", hidden=True)
+    else:
+        await ctx.send("You are not an admin", hidden=True)
 
 # @slash.slash(name='golink',description='Go link!',guild_ids=guilds)
 # async def golinkmsg(ctx):
