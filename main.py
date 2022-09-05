@@ -81,7 +81,7 @@ class TheReferee(Bot):
             if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextReprocessDate:
                 print("Reprocessing upgrades")
                 reprocessReq = requests.post(f"{backendBase}/reprocessfailed", headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
-                self.nextReprocessDate = self.determineNextFriday(timedelta(minutes=1))
+                self.nextReprocessDate = self.determineNextMidnight(timedelta(minutes=1))
 
     async def resetMaxes(self):
         await self.wait_until_ready()
