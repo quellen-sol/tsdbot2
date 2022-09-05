@@ -58,8 +58,6 @@ class TheReferee(Bot):
         self.nextUpgradeReset = self.determineNextFriday(timedelta(minutes=2))
         self.nextReprocessDate = self.determineNextFriday(timedelta(minutes=1))
 
-        self.yootTask = self.loop.create_task(self.checkForYootlist())
-
     def determineNextMidnight(self, offset = timedelta()):
         dt = date.today()
         midnight = offset + datetime.combine(dt, time(12,1,0), timezone(timedelta(hours=timezoneOffset)))
@@ -84,17 +82,6 @@ class TheReferee(Bot):
                 print("Reprocessing upgrades")
                 reprocessReq = requests.post(f"{backendBase}/reprocessfailed", headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
                 self.nextReprocessDate = self.determineNextFriday(timedelta(minutes=1))
-
-    async def checkForYootlist(self):
-        await self.wait_until_ready()
-        while True:
-            await asyncio.sleep(60);
-            listReq = requests.get("https://api.degods.com/scholarships/application/status?solPubkey=3uAvEjbkSY7GL2vddbczYwJxXWu74HHrkZeFB96u6Bi5", headers={'Content-Type': 'application/json'});
-            if listReq.status_code == 200:
-                listReq = listReq.json()
-                if listReq['status'] == 1:
-                    await self.get_channel(botLogChannel).send("<@!416430897894522890> You are y00tlisted gg lfg :boxing_glove:")
-                    break
 
     async def resetMaxes(self):
         await self.wait_until_ready()
