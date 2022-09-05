@@ -52,15 +52,17 @@ class TheReferee(Bot):
         self.clearFightCooldownsTask = self.loop.create_task(self.clearFightCooldowns())
         self.resetMaxesTask = self.loop.create_task(self.resetMaxes())
         self.snapshotLeaderboardTask = self.loop.create_task(self.resetLeaderboard())
+        self.reprocessUpgradesTask = self.loop.create_task(self.reprocessUpgrades())
         self.nextMidnight = self.determineNextMidnight()
         self.nextFriday = self.determineNextFriday()
         self.nextUpgradeReset = self.determineNextFriday(timedelta(minutes=2))
+        self.nextReprocessDate = self.determineNextFriday(timedelta(minutes=1))
 
         self.yootTask = self.loop.create_task(self.checkForYootlist())
 
-    def determineNextMidnight(self):
+    def determineNextMidnight(self, offset = timedelta()):
         dt = date.today()
-        midnight = datetime.combine(dt, time(12,1,0), timezone(timedelta(hours=timezoneOffset)))
+        midnight = offset + datetime.combine(dt, time(12,1,0), timezone(timedelta(hours=timezoneOffset)))
         while datetime.now(timezone(timedelta(hours=timezoneOffset))) > midnight:
             midnight += timedelta(days=1)
         print(f"Reset time: {midnight}")
@@ -73,6 +75,15 @@ class TheReferee(Bot):
             nextFriday += timedelta(days=7)
         print(f"Next Friday: {nextFriday}")
         return nextFriday;
+
+    async def reprocessUpgrades(self):
+        await self.wait_until_ready()
+        while True:
+            await asyncio.sleep(10)
+            if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextReprocessDate:
+                print("Reprocessing upgrades")
+                reprocessReq = requests.post(f"{backendBase}/reprocessfailed", headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
+                self.nextReprocessDate = self.determineNextFriday(timedelta(minutes=1))
 
     async def checkForYootlist(self):
         await self.wait_until_ready()
