@@ -56,7 +56,7 @@ class TheReferee(Bot):
         self.nextMidnight = self.determineNextMidnight()
         self.nextFriday = self.determineNextFriday()
         self.nextUpgradeReset = self.determineNextFriday(timedelta(minutes=2))
-        self.nextReprocessDate = self.determineNextFriday(timedelta(minutes=1))
+        self.nextReprocessDate = self.determineNextMidnight(timedelta(minutes=1))
 
     def determineNextMidnight(self, offset = timedelta()):
         dt = date.today()
