@@ -52,6 +52,7 @@ class TheReferee(Bot):
         self.clearFightCooldownsTask = self.loop.create_task(self.clearFightCooldowns())
         self.resetMaxesTask = self.loop.create_task(self.resetMaxes())
         self.snapshotLeaderboardTask = self.loop.create_task(self.resetLeaderboard())
+        self.resetUpgradeCooldownTask = self.loop.create_task(self.resetUpgradeCooldowns())
         self.reprocessUpgradesTask = self.loop.create_task(self.reprocessUpgrades())
         self.nextMidnight = self.determineNextMidnight()
         self.nextFriday = self.determineNextFriday()
@@ -80,7 +81,7 @@ class TheReferee(Bot):
             await asyncio.sleep(10)
             if datetime.now(timezone(timedelta(hours=timezoneOffset))) > self.nextReprocessDate:
                 print("Reprocessing upgrades")
-                reprocessReq = requests.post(f"{backendBase}/reprocessfailed", headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
+                reprocessReq = requests.post(f"{backendBase}reprocessfailed", headers={'Content-Type': 'application/json'}, data=json.dumps({'key': apiAccessKey}), timeout=2.0)
                 self.nextReprocessDate = self.determineNextMidnight(timedelta(minutes=3))
 
     async def resetMaxes(self):
