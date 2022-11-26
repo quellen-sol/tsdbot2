@@ -42,7 +42,7 @@ onlineMemberStat = 945910425218863124
 
 allowedLinkChannels = [945904467239387186]
 
-timezoneOffset = -7 #PDT = -7, UTC = 0
+timezoneOffset = -8 #PDT = -7, UTC = 0
 
 class TheReferee(Bot):
     def __init__(self, *args,**kwargs):
